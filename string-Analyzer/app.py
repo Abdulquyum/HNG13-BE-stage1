@@ -71,17 +71,14 @@ def get_string(value):
 @app.route('/strings', methods=['GET'], strict_slashes=False)
 def filtered_strings():
     try:
-        is_palindrome_param = request.args.get('is_palindrome')
-        is_palindrome = None
-        if is_palindrome_param is not None:
-            is_palindrome_param = is_palindrome_param.lower()
-            if is_palindrome_param in ['true', '1', 'yes']:
+        is_palindrome = request.args.get('is_palindrome', type=str)
+        if is_palindrome is not None:
+            is_palindrome = is_palindrome.lower()
+            if is_palindrome == 'true':
                 is_palindrome = True
-            elif is_palindrome_param in ['false', '0', 'no']:
+            elif is_palindrome == 'false':
                 is_palindrome = False
-            else:
-                return jsonify({"error": "is_palindrome must be a boolean value (true/false)"}), 400
-        
+    
         min_length = request.args.get('min_length', type=int)
         max_length = request.args.get('max_length', type=int)
         word_count = request.args.get('word_count', type=int)
@@ -178,12 +175,7 @@ def parse_natural_language(query):
 
     if 'single word' in query_lower or 'one word' in query_lower:
         filters['word_count'] = 1
-    elif 'two word' in query_lower or '2 word' in query_lower:
-        filters['word_count'] = 2
-    elif 'three word' in query_lower or '3 word' in query_lower:
-        filters['word_count'] = 3
     
-    # Length detection
     length_match = re.search(r'longer than\s+(\d+)\s+characters?', query_lower)
     if length_match:
         filters['min_length'] = int(length_match.group(1)) + 1
@@ -196,6 +188,12 @@ def parse_natural_language(query):
     if length_match:
         filters['min_length'] = int(length_match.group(1))
         filters['max_length'] = int(length_match.group(1))
+
+    if 'first vowel' in query_lower:
+        filters['contains_character'] = 'a'
+
+    if 'letter z' in query_lower:
+        filters['contains_character'] = 'z'
 
     if not filters:
         return None
