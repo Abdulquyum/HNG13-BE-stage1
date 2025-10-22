@@ -41,6 +41,7 @@ def analyze_strings():
             "is_palindrome": string == string[::-1],
             "unique_characters": len(set(string)),
             "word_count": len(string.split()),
+            "sha256_hash": hashed_string,
             "character_frequency": {
                 char: string.count(char) for char in set(string)
             }
