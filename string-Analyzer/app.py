@@ -13,12 +13,12 @@ collected_strings = {}
 @app.route('/strings', methods=['POST'], strict_slashes=False)
 def analyze_strings():
     try:
-        if not request.is_json:
-            return jsonify({"error": "Invalid request body or missing 'value' field"}), 400
+        # if not request.is_json:
+        #     return jsonify({"error": "Invalid request body or missing 'value' field"}), 400
         
         data = request.get_json()
-        if not data or 'value' not in data:
-            return jsonify({"error": "Invalid request body or missing 'value' field"}), 400
+        # if not data or 'value' not in data:
+        #     return jsonify({"error": "Invalid request body or missing 'value' field"}), 400
             
         string = data.get('value', '')
         
@@ -46,7 +46,7 @@ def analyze_strings():
                 char: string.count(char) for char in set(string)
             }
         },
-        "created_at": datetime.now(timezone.utc).isoformat()
+        "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     }
     
     collected_strings[string] = result
@@ -211,6 +211,16 @@ def check_filter_conflicts(filters):
             return "single word strings cannot contain spaces"
     
     return None
+
+@app.route('/strings/<string:value>', methods=['DELETE'], strict_slashes=False)
+def delete_string(value):
+    if value not in collected_strings:
+        return jsonify({"error": "String does not exist in the system"}), 404
+    
+    for value in collected_strings:
+        if isinstance(collected_strings[value], dict) and collected_strings[value].get('value') == value:
+            del collected_strings[value]
+            return jsonify({}), 204
 
 if __name__ == '__main__':
     app.run(port=3000, host='0.0.0.0', debug=True)
