@@ -87,3 +87,6 @@ sudo systemctl reload nginx
 sudo systemctl daemon-reload
 sudo systemctl enable flask-app
 sudo systemctl start flask-app
+
+#### Change gunicorn serever to one worker
+- sudo sed -i 's/--workers 3/--workers 1/' /etc/systemd/system/flask-app.service

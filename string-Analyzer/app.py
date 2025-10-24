@@ -42,7 +42,7 @@ def analyze_strings():
             "unique_characters": len(set(string)),
             "word_count": len(string.split()),
             "sha256_hash": hashed_string,
-            "character_frequency": {
+            "character_frequency_map": {
                 char: string.count(char) for char in set(string)
             }
         },
@@ -56,17 +56,12 @@ def analyze_strings():
 @app.route('/strings/<string:value>', methods=['GET'], strict_slashes=False)
 def get_string(value):
     string_data = collected_strings.get(value)
-    
+
     if not string_data:
-        for data in collected_strings.values():
-            if isinstance(data, dict) and data.get('value') == value:
-                string_data = data
-                break
-    
-    if string_data:
-        return jsonify(string_data), 200
-    else:
         return jsonify({"error": "String does not exist in the system"}), 404
+
+    else:
+        return jsonify(string_data), 200
 
 
 @app.route('/strings', methods=['GET'], strict_slashes=False)
