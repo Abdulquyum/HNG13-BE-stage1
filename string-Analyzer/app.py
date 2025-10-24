@@ -13,12 +13,12 @@ collected_strings = {}
 @app.route('/strings', methods=['POST'], strict_slashes=False)
 def analyze_strings():
     try:
-        # if not request.is_json:
-        #     return jsonify({"error": "Invalid request body or missing 'value' field"}), 400
+        if not request.is_json:
+            return jsonify({"error": "Invalid request body or missing 'value' field"}), 400
         
         data = request.get_json()
-        # if not data or 'value' not in data:
-        #     return jsonify({"error": "Invalid request body or missing 'value' field"}), 400
+        if not data or 'value' not in data:
+            return jsonify({"error": "Invalid request body or missing 'value' field"}), 400
             
         string = data.get('value', '')
         
